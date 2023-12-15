@@ -12,6 +12,14 @@ require_relative 'mig/modules/common'
 
 module Envoi
   module Mig
+
+    MODULES = [
+      { name: 'Exiftool', class: ExifTool, symbol: :exiftool, enabled: true },
+      { name: 'FileMagic', class: MediaType, symbol: :filemagic, enabled: true },
+      { name: 'FFProbe', class: Ffprobe, symbol: :ffprobe, enabled: true },
+      { name: 'MediaInfo', class: Mediainfo, symbol: :mediainfo, enabled: true },
+    ].freeze
+
     class << self
       def run(file_path, options)
         mig = Main.new(options)
