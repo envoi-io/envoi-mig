@@ -13,10 +13,10 @@ class Ffprobe
 
       @path = path
 
-      @ffmpeg_cmd_path = options.fetch(:ffmpeg_cmd_path, 'ffprobe')
+      @ffprobe_cmd_path = options.fetch(:ffprobe_cmd_path, 'ffprobe')
 
-      # ffmpeg will output to stderr
-      @command = [@ffmpeg_cmd_path, '-i', path].shelljoin
+      # ffprobe will output to stderr
+      @command = [@ffprobe_cmd_path, '-i', path].shelljoin
       @output = Open3.popen3(command) { |_stdin, _stdout, stderr| stderr.read }
 
       fix_encoding(@output)
@@ -130,7 +130,7 @@ class Ffprobe
     def to_hash
       hash = {}
       variables = instance_variables
-      %i[@ffmpeg_cmd_path @logger].each { |cmd| variables.delete(cmd) }
+      %i[@ffprobe_cmd_path @logger].each { |cmd| variables.delete(cmd) }
       variables.each do |instance_variable_name|
         hash[instance_variable_name.to_s[1..]] = instance_variable_get(instance_variable_name)
       end
@@ -169,16 +169,16 @@ class Ffprobe
   end
 
   # @param [Hash] options
-  # @option options [String] :ffmpeg_cmd_path
+  # @option options [String] :ffprobe_cmd_path
   def initialize(options = {})
-    @ffmpeg_cmd_path = options.fetch(:ffmpeg_cmd_path, 'ffmpeg')
+    @ffprobe_cmd_path = options.fetch(:ffprobe_cmd_path, 'ffprobe')
   end
 
   # @param [String] file_path
   # @param [Hash] options
-  # @option options [String] :ffmpeg_cmd_path
+  # @option options [String] :ffprobe_cmd_path
   def run(file_path, options = {})
-    options = { ffmpeg_cmd_path: @ffmpeg_cmd_path }.merge(options)
+    options = { ffprobe_cmd_path: @ffprobe_cmd_path }.merge(options)
     Movie.new(file_path, options).to_hash
   end
 end
