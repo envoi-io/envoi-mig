@@ -43,21 +43,22 @@ Make sure that Ruby is installed and that the os-specific equivalent of the abov
 
 ```shell
 Usage: envoi-mig [options] media_file_path
-    -l, --log-level LEVEL            Set log level (debug, info, warn, error, fatal)
-                                     default: warn
-        --exif-cmd-path PATH         Set Exif command file path
+        --exiftool-cmd-path PATH     Set Exiftool command file path
     -f, --ffprobe-cmd-path PATH      Set FFProbe command file path
     -m, --mediainfo-cmd-path PATH    Set MediaInfo command file path
     -e, --enable-modules x,y,z       Enable modules (exiftool, ffprobe, filemagic, mediainfo)
                                      default: exiftool, filemagic, ffprobe, mediainfo
+    -l, --log-level LEVEL            Set log level (debug, info, warn, error, fatal)
+                                     default: warn
         --[no-]log-to-console [stdout|stderr]
-                                     Log to console
+                                     Console device to output log entries to
                                      default: stderr
-    -L, --log-to-file DEST           File path to output log entries to.
-    -o, --output-file PATH           Set output json file path
-        --[no-]output-to-console     Output to console
+    -L, --log-to-file DEST           File path to output log entries to
+    -o, --output-file PATH           Output the media information JSON file path
+        --[no-]output-to-console     Output the media information JSON to the console
                                      default: true
     -h, --help                       Prints this help
+
 ```
 
 ```shell

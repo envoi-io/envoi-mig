@@ -34,11 +34,7 @@ module Envoi
       def self.init_parser(options = @options)
         OptionParser.new do |parser|
           parser.banner = 'Usage: envoi-mig [options] media_file_path'
-          parser.on('-l', '--log-level LEVEL', 'Set log level (debug, info, warn, error, fatal)',
-                    "default: #{options[:log_level]}") do |level|
-            options[:log_level] = level.downcase.to_sym
-          end
-          parser.on('-exif', '--exif-cmd-path PATH', 'Set Exif command file path') do |path|
+          parser.on('-exif', '--exiftool-cmd-path PATH', 'Set Exiftool command file path') do |path|
             options[:exiftool_cmd_path] = path
           end
           parser.on('-ffprobe', '--ffprobe-cmd-path PATH', 'Set FFProbe command file path') do |path|
@@ -51,16 +47,20 @@ module Envoi
                     "default: #{options[:enabled_modules].join(', ')}") do |list|
             options[:enabled_modules] = list
           end
-          parser.on('--[no-]log-to-console [stdout|stderr]', 'Log to console', "default: #{options[:log_to_console]}") do |location|
+          parser.on('-l', '--log-level LEVEL', 'Set log level (debug, info, warn, error, fatal)',
+                    "default: #{options[:log_level]}") do |level|
+            options[:log_level] = level.downcase.to_sym
+          end
+          parser.on('--[no-]log-to-console [stdout|stderr]', 'Console device to output log entries to', "default: #{options[:log_to_console]}") do |location|
             options[:log_to_console] = location.to_sym
           end
-          parser.on('-L', '--log-to-file DEST', 'File path to output log entries to.') do |location|
+          parser.on('-L', '--log-to-file DEST', 'File path to output log entries to') do |location|
             options[:log_file_path] = location
           end
-          parser.on('-o', '--output-file PATH', 'Set output json file path') do |path|
+          parser.on('-o', '--output-file PATH', 'Output the media information JSON file path') do |path|
             options[:output_file] = path
           end
-          parser.on('--[no-]output-to-console', 'Output to console',
+          parser.on('--[no-]output-to-console', 'Output the media information JSON to the console',
                     "default: #{options[:output_to_console]}") do |output_to_console|
             options[:output_to_console] = output_to_console
           end
