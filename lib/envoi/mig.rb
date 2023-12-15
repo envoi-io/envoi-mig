@@ -77,6 +77,12 @@ module Envoi
         @metadata_sources = run_modules(file_path)
         log.debug { "Metadata gathering completed. Took: #{Time.now - gathering_start} seconds" }
 
+        output_json = JSON.pretty_generate(metadata_sources)
+
+        File.write(options[:output_file], output_json) if options[:output_file]
+
+        puts output_json if options[:output_to_console]
+
         metadata_sources
       end
 
