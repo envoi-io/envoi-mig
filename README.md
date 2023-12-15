@@ -44,8 +44,8 @@ Make sure that Ruby is installed and that the os-specific equivalent of the abov
 ```shell
 Usage: envoi-mig [options] media_file_path
         --exiftool-cmd-path PATH     Set Exiftool command file path
-    -f, --ffprobe-cmd-path PATH      Set FFProbe command file path
-    -m, --mediainfo-cmd-path PATH    Set MediaInfo command file path
+        --ffprobe-cmd-path PATH      Set FFProbe command file path
+        --mediainfo-cmd-path PATH    Set MediaInfo command file path
     -e, --enable-modules x,y,z       Enable modules (exiftool, ffprobe, filemagic, mediainfo)
                                      default: exiftool, filemagic, ffprobe, mediainfo
     -l, --log-level LEVEL            Set log level (debug, info, warn, error, fatal)

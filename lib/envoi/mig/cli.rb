@@ -34,13 +34,13 @@ module Envoi
       def self.init_parser(options = @options)
         OptionParser.new do |parser|
           parser.banner = 'Usage: envoi-mig [options] media_file_path'
-          parser.on('-exif', '--exiftool-cmd-path PATH', 'Set Exiftool command file path') do |path|
+          parser.on('--exiftool-cmd-path PATH', 'Set Exiftool command file path') do |path|
             options[:exiftool_cmd_path] = path
           end
-          parser.on('-ffprobe', '--ffprobe-cmd-path PATH', 'Set FFProbe command file path') do |path|
+          parser.on('--ffprobe-cmd-path PATH', 'Set FFProbe command file path') do |path|
             options[:ffprobe_cmd_path] = path
           end
-          parser.on('-mediainfo', '--mediainfo-cmd-path PATH', 'Set MediaInfo command file path') do |path|
+          parser.on('--mediainfo-cmd-path PATH', 'Set MediaInfo command file path') do |path|
             options[:mediainfo_cmd_path] = path
           end
           parser.on('-e', '--enable-modules x,y,z', Array, "Enable modules (#{@module_list.join(', ')})",
