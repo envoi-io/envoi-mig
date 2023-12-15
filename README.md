@@ -32,12 +32,20 @@ Make sure that Ruby is installed and that the os-specific equivalent of the abov
 
 ## Install the Application
 
-```
-# Clone the Repo
 
-# Install the Gem
+### Manual
+
+#### Clone the Repo
+
+```shell
+git clone https://github.com/envoi-io/envoi-mig.git
 ```
 
+##### Create the link to the executable
+
+```shell
+ln -s `realpath exe/envoi-mig` /usr/local/bin/envoi-mig
+```
 
 ## Usage
 
@@ -64,5 +72,8 @@ Usage: envoi-mig [options] media_file_path
 ```shell
 envoi-mig <path_to_media_file>
 ```
+
+
+
 
 
