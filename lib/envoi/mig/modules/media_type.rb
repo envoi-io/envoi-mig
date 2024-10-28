@@ -1,7 +1,7 @@
 begin
   require 'filemagic/ext'
   MEDIA_TYPE_ENABLED = true
-rescue StandardError => _e
+rescue LoadError => _e
   MEDIA_TYPE_ENABLED = false
 end
 
