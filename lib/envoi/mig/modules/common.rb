@@ -41,15 +41,15 @@ module Envoi
         width = ffmpeg['width']
         video_system = determine_video_system(height, width, frame_rate)
 
-        file_path = ffmpeg['path']
-        source_directory = File.dirname(file_path)
+        file_path = ffmpeg['path'] || mediainfo['General']['Complete name']
+        source_directory = file_path ? File.dirname(file_path) : nil
 
         cv[:file_path] = file_path
         cv[:source_directory] = source_directory
         cv[:aspect_ratio] = ffmpeg['is_widescreen'] ? '16:9' : '4:3'
         cv[:audio_sample_rate] = ffmpeg['audio_sample_rate']
         cv[:bit_depth] = mi_video['Bit depth']
-        cv[:calculated_aspect_ratio] = ffmpeg['calculated_aspect_ratio']
+        cv[:calculated_aspect_quotient] = ffmpeg['calculated_aspect_quotient']
         cv[:chroma_subsampling] = mi_video['Chroma subsampling']
         cv[:codec_id] = mediainfo['Codec ID']
         cv[:codec_commercial_name] = mediainfo['Commercial name']
