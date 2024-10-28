@@ -55,7 +55,7 @@ class Ffprobe
         if aspect_ratios
           @dar = ::Regexp.last_match(1) if aspect_ratios[/DAR (\d+:\d+)/] rescue nil # Display Aspect Ratio = SAR * PAR
           @sar = ::Regexp.last_match(1) if aspect_ratios[/SAR (\d+:\d+)/] rescue nil # Storage Aspect Ratio = DAR/PAR
-          @par = ::Regexp.last_match(1) if aspect_ratios[/PAR (\d+:\d+)/] rescue nil # Pixel aspect ratio = DAR/SAR
+          @par = ::Regexp.last_match(1) if aspect_ratios[/PAR (\d+:\d+)/] rescue nil # Pixel Aspect Ratio = DAR/SAR
         end
         # rubocop:enable Style/RescueModifier
 
@@ -82,7 +82,7 @@ class Ffprobe
 
     # @return [Boolean?]
     def is_widescreen?
-      @is_widescreen ||= aspect_from_dimensions.is_a?(Numeric) ? aspect_from_dimensions > 1.4 : nil
+      @is_widescreen ||= @aspect_quotient_from_dimensions.is_a?(Numeric) ? @aspect_quotient_from_dimensions > 1.4 : nil
     end
     alias is_wide_screen? is_widescreen?
 
@@ -96,8 +96,8 @@ class Ffprobe
     alias is_high_def? is_high_definition?
 
     # Will attempt to
-    def calculated_aspect_ratio
-      @calculated_aspect_ratio ||= aspect_from_dar || aspect_from_dimensions
+    def calculated_aspect_quotient
+      @calculated_aspect_quotient ||= aspect_quotient_from_dar || aspect_quotient_from_dimensions
     end
 
     # @return [Integer] File Size
@@ -135,29 +135,29 @@ class Ffprobe
         hash[instance_variable_name.to_s[1..]] = instance_variable_get(instance_variable_name)
       end
       hash['audio_channel_count'] = audio_channel_count
-      hash['calculated_aspect_ratio'] = calculated_aspect_ratio
+      hash['calculated_aspect_quotient'] = calculated_aspect_quotient
       hash
     end
 
     protected
 
     # @return [Float|Integer|nil]
-    def aspect_from_dar
-      return @aspect_from_dar if @aspect_from_dar
+    def aspect_quotient_from_dar
+      return @aspect_quotient_from_dar if @aspect_quotient_from_dar
       return nil unless dar
 
       w, h = dar&.split(':')
       aspect = w.fdiv(h)
-      @aspect_from_dar = aspect.zero? ? nil : aspect
+      @aspect_quotient_from_dar = aspect.zero? ? nil : aspect
     end
 
     # @return [Fixed]
-    def aspect_from_dimensions
-      return @aspect_from_dimensions if @aspect_from_dimensions
+    def aspect_quotient_from_dimensions
+      return @aspect_quotient_from_dimensions if @aspect_quotient_from_dimensions
       return nil unless width.is_a?(Numeric) && height.is_a?(Numeric)
 
       aspect = width&.fdiv(height) rescue nil # rubocop:disable Style/RescueModifier
-      @aspect_from_dimensions = aspect.nan? ? nil : aspect
+      @aspect_quotient_from_dimensions = !aspect || aspect.nan? ? nil : aspect
     end
 
     # @param [String] output
