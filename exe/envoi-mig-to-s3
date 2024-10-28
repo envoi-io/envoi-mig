@@ -24,30 +24,28 @@ class EnvoiMigToS3Exec
   end
 
   def parse_options
-    OptionParser.new do |parser|
-      parser.banner = 'Usage: envoi-mig-to-s3 [options] media_file_path'
+    parser = OptionParser.new do |opts|
+      opts.banner = 'Usage: envoi-mig-to-s3 [options] media_file_path'
 
-      parser.on('--bucket BUCKET', 'S3 bucket name') do |bucket|
+      opts.on('--bucket BUCKET', 'S3 bucket name') do |bucket|
         @options[:bucket] = bucket
       end
 
-      parser.on('--prefix PREFIX', 'S3 object key prefix') do |prefix|
+      opts.on('--prefix PREFIX', 'S3 object key prefix') do |prefix|
         prefix = prefix[0..-2] if prefix[-1] == '/'
         @options[:prefix] = prefix
       end
 
-      parser.on('-h', '--help', 'Prints this help') do
-        puts parser
+      opts.on('-h', '--help', 'Prints this help') do
+        puts opts
         exit
       end
+    end
 
-      parser.separator ''
-      parser.separator 'Other options for Envoi::Mig::Cli:'
-
-      parser.on_tail do |*args|
-        @options[:envoi_args] = args
-      end
-    end.parse!(ARGV)
+    # Parse the options and remaining arguments
+    parser.order!(ARGV) do |arg|
+      @options[:envoi_args] << arg
+    end
   end
 
   def run
@@ -58,8 +56,9 @@ class EnvoiMigToS3Exec
       exit 1
     end
 
-    output_file = 'output.json'
+    output_file = "#{@options[:envoi_args].last}.json"
     envoi_args = @options[:envoi_args] + ['--output-file', output_file]
+
     Envoi::Mig::Cli.run(envoi_args)
 
     upload_file(output_file)
@@ -70,7 +69,8 @@ class EnvoiMigToS3Exec
   def upload_file(file)
     s3 = Aws::S3::Client.new
     key = File.join(@options[:prefix], File.basename(file))
-    puts "Uploading #{file} to s3://#{@options[:bucket]}/#{key}"
+    key = key[1..] if key[0] == '/'
+    puts "Uploading #{file} to s3://#{File.join(@options[:bucket], key)}"
     s3.put_object(bucket: @options[:bucket], key: key, body: File.read(file))
   end
 end
