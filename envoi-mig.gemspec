@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'ruby-filemagic', '~> 0.7'
+  spec.add_dependency 'aws-sdk-s3', '~> 1.89'
 
   spec.add_development_dependency 'minitest', '~> 5'
   spec.add_development_dependency 'rake', '~> 10'

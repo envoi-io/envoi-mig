@@ -1,0 +1,78 @@
+#!/usr/bin/env ruby
+
+lib_path = File.expand_path('../lib', __dir__ || '.')
+$LOAD_PATH.unshift lib_path unless $LOAD_PATH.include?(lib_path)
+
+begin
+  require 'aws-sdk-s3'
+rescue LoadError
+  puts 'aws-sdk-s3 gem not found. Please run `bundle install`.'
+  exit 1
+end
+
+require 'optparse'
+require_relative '../lib/envoi/mig/cli'
+
+class EnvoiMigToS3Exec
+
+  def initialize
+    @options = {
+      bucket: nil,
+      prefix: '',
+      envoi_args: []
+    }
+  end
+
+  def parse_options
+    OptionParser.new do |parser|
+      parser.banner = 'Usage: envoi-mig-to-s3 [options] media_file_path'
+
+      parser.on('--bucket BUCKET', 'S3 bucket name') do |bucket|
+        @options[:bucket] = bucket
+      end
+
+      parser.on('--prefix PREFIX', 'S3 object key prefix') do |prefix|
+        prefix = prefix[0..-2] if prefix[-1] == '/'
+        @options[:prefix] = prefix
+      end
+
+      parser.on('-h', '--help', 'Prints this help') do
+        puts parser
+        exit
+      end
+
+      parser.separator ''
+      parser.separator 'Other options for Envoi::Mig::Cli:'
+
+      parser.on_tail do |*args|
+        @options[:envoi_args] = args
+      end
+    end.parse!(ARGV)
+  end
+
+  def run
+    parse_options
+
+    if @options[:bucket].nil? || @options[:prefix].nil?
+      puts 'Please provide both --bucket and --prefix options.'
+      exit 1
+    end
+
+    output_file = 'output.json'
+    envoi_args = @options[:envoi_args] + ['--output-file', output_file]
+    Envoi::Mig::Cli.run(envoi_args)
+
+    upload_file(output_file)
+  end
+
+  private
+
+  def upload_file(file)
+    s3 = Aws::S3::Client.new
+    key = File.join(@options[:prefix], File.basename(file))
+    puts "Uploading #{file} to s3://#{@options[:bucket]}/#{key}"
+    s3.put_object(bucket: @options[:bucket], key: key, body: File.read(file))
+  end
+end
+
+EnvoiMigToS3Exec.new.run if $PROGRAM_NAME == __FILE__
