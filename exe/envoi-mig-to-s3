@@ -11,16 +11,18 @@ rescue LoadError
 end
 
 require 'optparse'
+require 'logger'
 require_relative '../lib/envoi/mig/cli'
 
 class EnvoiMigToS3Exec
-
   def initialize
     @options = {
       bucket: nil,
       prefix: '',
-      envoi_args: []
+      envoi_args: [],
+      overwrite: true
     }
+    @logger = Logger.new($stdout)
   end
 
   def parse_options
@@ -34,6 +36,10 @@ class EnvoiMigToS3Exec
       opts.on('--prefix PREFIX', 'S3 object key prefix') do |prefix|
         prefix = prefix[0..-2] if prefix[-1] == '/'
         @options[:prefix] = prefix
+      end
+
+      opts.on('--[no-]overwrite', 'Overwrite existing files (default: overwrite)') do |overwrite|
+        @options[:overwrite] = overwrite
       end
 
       opts.on('-h', '--help', 'Prints this help') do
@@ -59,9 +65,14 @@ class EnvoiMigToS3Exec
     output_file = "#{@options[:envoi_args].last}.json"
     envoi_args = @options[:envoi_args] + ['--output-file', output_file]
 
-    Envoi::Mig::Cli.run(envoi_args)
-
-    upload_file(output_file)
+    begin
+      Envoi::Mig::Cli.run(envoi_args)
+      upload_file(output_file)
+      exit 0
+    rescue StandardError => e
+      @logger.error("An error occurred: #{e.message}")
+      exit 1
+    end
   end
 
   private
@@ -70,8 +81,25 @@ class EnvoiMigToS3Exec
     s3 = Aws::S3::Client.new
     key = File.join(@options[:prefix], File.basename(file))
     key = key[1..] if key[0] == '/'
+
     puts "Uploading #{file} to s3://#{File.join(@options[:bucket], key)}"
-    s3.put_object(bucket: @options[:bucket], key: key, body: File.read(file))
+
+    options = {
+      bucket: @options[:bucket],
+      key: key,
+      body: File.read(file)
+    }
+
+    unless @options[:overwrite]
+      options[:if_none_match] = '*'
+    end
+
+    begin
+      s3.put_object(options)
+      puts "Upload successful."
+    rescue Aws::S3::Errors::ServiceError => e
+      @logger.error("Failed to upload file: #{e.message}")
+    end
   end
 end
 
